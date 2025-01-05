@@ -43,9 +43,9 @@ Fine-Tune Llama-7b on SE paired dataset
 """
 
 
+# 配置并解析命令行参数。
 def get_args():
     """
-    配置并解析命令行参数。
     Returns: Namespace: 解析后的命令行参数。
     """
     parser = argparse.ArgumentParser()
@@ -110,6 +110,7 @@ def get_args():
     return parser.parse_args()
 
 
+# 计算数据集的字符characters与令牌tokens的比例
 def chars_token_ratio(dataset, tokenizer, nb_examples=400):
     """
     Estimate the average number of characters per token in the dataset.
@@ -140,6 +141,7 @@ def chars_token_ratio(dataset, tokenizer, nb_examples=400):
     return total_characters / total_tokens
 
 
+# 打印模型的可训练参数
 def print_trainable_parameters(model):
     """
     Prints the number of trainable parameters in the model.
@@ -165,6 +167,7 @@ def print_trainable_parameters(model):
     )
 
 
+# 准备样本文本
 def prepare_sample_text(example):
     """Prepare the text from a sample of the dataset.
     Args:
@@ -177,6 +180,7 @@ def prepare_sample_text(example):
     return text
 
 
+# 创建训练和验证数据集
 def create_datasets(tokenizer, args):
     """
     创建训练和验证数据集。
@@ -251,6 +255,7 @@ def create_datasets(tokenizer, args):
     return train_dataset, valid_dataset
 
 
+# 运行训练过程
 def run_training(args, train_data, val_data):
     """
     运行训练过程。
@@ -310,12 +315,12 @@ def run_training(args, train_data, val_data):
 
     # 初始化SFT训练器
     trainer = SFTTrainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_data,
-        eval_dataset=val_data,
-        peft_config=lora_config,
-        packing=True,
+        model=model,  # 传入经过预处理的模型
+        args=training_args,  # 传入训练参数配置
+        train_dataset=train_data,  # 传入训练数据集
+        eval_dataset=val_data,  # 传入验证数据集
+        peft_config=lora_config,  # 传入LoRA配置参数
+        packing=True,  # 启用模型压缩以提高训练效率
     )
     # 打印模型的可训练参数
     print_trainable_parameters(trainer.model)
@@ -329,6 +334,7 @@ def run_training(args, train_data, val_data):
     trainer.model.save_pretrained(os.path.join(args.output_dir, "final_checkpoint/"))
 
 
+# 主函数，用于执行模型的训练和评估流程
 def main(args):
     """
     主函数，用于执行模型的训练和评估流程。
